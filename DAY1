@@ -1,0 +1,39 @@
+!pip install gradio transformers nltk
+
+import gradio as gr
+from transformers import pipeline
+import nltk
+from nltk.tokenize import sent_tokenize
+
+nltk.download("punkt")
+
+summarizer = pipeline("summarization")
+
+def chunk_text(text, max_tokens=500):
+    sentences = sent_tokenize(text)
+    chunks = []
+    current_chunk = ""
+    for sentence in sentences:
+        if len(current_chunk.split()) + len(sentence.split()) < max_tokens:
+            current_chunk += " " + sentence
+        else:
+            chunks.append(current_chunk)
+            current_chunk = sentence
+    chunks.append(current_chunk)
+    return chunks
+
+def summarize_text(input_text):
+    chunks = chunk_text(input_text)
+    summary = ""
+    for chunk in chunks[:3]:
+        result = summarizer(chunk, max_length=150, min_length=40, do_sample=False)
+        summary += result[0]["summary_text"] + "\n\n"
+    return summary
+
+gr.Interface(
+    fn=summarize_text,
+    inputs=gr.Textbox(label="Paste Research Text Here", lines=15),
+    outputs=gr.Textbox(label="AI Summary"),
+    title="🧠 Text Summarizer",
+    description="Paste some research text below to get a quick summary using AI 🤖"
+).launch(share=True)
