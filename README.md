@@ -32,7 +32,7 @@ AI generates concise summaries for each chunk
 All summaries are combined and shown to the user
 
 ### Screenshot
-![My App UI](DAY1SS.png)
+![My App UI](DAY1 SS.png)
 
 
 
